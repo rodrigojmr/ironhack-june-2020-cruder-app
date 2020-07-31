@@ -43,51 +43,48 @@ postRouter.post(
   }
 );
 
-postRouter.get('/:id', (request, response, next) => {
+postRouter.get('/:id', async (request, response, next) => {
   const id = request.params.id;
 
-  Post.findById(id)
-    .populate('creator')
-    .then(post => {
-      if (post) {
-        response.render('post/single', { post: post });
-      } else {
-        next();
-      }
-    })
-    .catch(error => {
-      next(error);
-    });
+  try {
+    const post = await Post.findById(id).populate('creator');
+    if (post) {
+      response.render('post/single', { post: post });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
-postRouter.post('/:id/delete', routeAuthenticationGuard, (request, response, next) => {
+postRouter.post('/:id/delete', routeAuthenticationGuard, async (request, response, next) => {
   const id = request.params.id;
   const userId = request.session.userId;
 
-  Post.findOneAndDelete({ _id: id, creator: userId })
-    .then(() => {
-      response.redirect('/');
-    })
-    .catch(error => {
-      next(error);
-    });
+  try {
+    await Post.findOneAndDelete({ _id: id, creator: userId });
+    response.redirect('/');
+  } catch (error) {
+    next(error);
+  }
 });
 
-postRouter.get('/:id/edit', routeAuthenticationGuard, (request, response, next) => {
+postRouter.get('/:id/edit', routeAuthenticationGuard, async (request, response, next) => {
   const id = request.params.id;
   const userId = request.session.userId;
 
-  Post.findOne({ _id: id, creator: userId })
-    .then(post => {
-      if (post) {
-        response.render('post/edit', { post });
-      } else {
-        next();
-      }
-    })
-    .catch(error => {
-      next(error);
-    });
+  try {
+    const post = await Post.findById(id).populate('creator');
+    if (post) {
+      response.render('post/single', { post: post });
+      response.render('post/edit', { post });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
 postRouter.post('/:id/edit', routeAuthenticationGuard, (request, response, next) => {
