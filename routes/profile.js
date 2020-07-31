@@ -6,6 +6,23 @@ const routeAuthenticationGuard = require('./../middleware/route-authentication-g
 
 const profileRouter = new express.Router();
 
+profileRouter.get('/edit', routeAuthenticationGuard, (request, response, next) => {
+  response.render('profile/edit');
+});
+
+profileRouter.post('/edit', routeAuthenticationGuard, (request, response, next) => {
+  const id = request.session.userId;
+  const { name, email } = request.body;
+
+  User.findByIdAndUpdate(id, { name, email })
+    .then(() => {
+      response.redirect('/profile');
+    })
+    .catch(error => {
+      next(error);
+    });
+});
+
 profileRouter.get('/:id', routeAuthenticationGuard, (request, response, next) => {
   const id = request.params.id;
 
@@ -18,23 +35,6 @@ profileRouter.get('/:id', routeAuthenticationGuard, (request, response, next) =>
     })
     .then(posts => {
       response.render('profile/display', { profile: user, posts });
-    })
-    .catch(error => {
-      next(error);
-    });
-});
-
-profileRouter.get('/edit', routeAuthenticationGuard, (request, response, next) => {
-  response.render('profile/edit');
-});
-
-profileRouter.post('/edit', routeAuthenticationGuard, (request, response, next) => {
-  const id = request.session.userId;
-  const { name, email } = request.body;
-
-  User.findByIdAndUpdate(id, { name, email })
-    .then(() => {
-      response.redirect('/profile');
     })
     .catch(error => {
       next(error);
