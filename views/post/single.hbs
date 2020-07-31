@@ -1,0 +1,16 @@
+<h1>Single Post</h1>
+
+<span>Created by <a href="/profile/{{ post.creator._id }}">{{ post.creator.name }}</a></span>
+
+<div class="post">
+  {{#if post.photo}}
+    <img src="{{post.photo}}" />
+  {{/if}}
+  <p>{{ post.content }}</p>
+</div>
+
+<a href="/post/{{ post.id }}/edit">Edit Post</a>
+
+<form method="POST" action="/post/{{ post.id }}/delete">
+  <button>Delete Post</button>
+</form>
